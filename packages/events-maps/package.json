@@ -13,10 +13,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@effect/platform": "^0.72.0",
-    "effect": "^3.12.0"
-  },
   "exports": {
     ".": {
       "types": "./src/index.ts",
