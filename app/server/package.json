@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "server",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "API implementation of Test Canvas",
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "serve": "node dist/index.cjs",
+    "build": "tsup",
+    "check": "biome check --write ./src",
+    "format": "biome format --write ./src",
+    "lint": "biome lint --write ./src"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@repo/biome-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "effect": "^3.12.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.14",
+    "@types/node": "^22.10.2",
+    "@types/source-map-support": "^0.5.10",
+    "source-map-support": "^0.5.21",
+    "tsup": "^8.3.5"
+  }
+}
