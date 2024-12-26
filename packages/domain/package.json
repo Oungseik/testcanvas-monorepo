@@ -19,6 +19,9 @@
       "default": "./dist/index.js"
     }
   },
+  "dependencies": {
+    "effect": "^3.12.0"
+  },
   "devDependencies": {
     "@repo/biome-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
