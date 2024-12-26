@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@repo/events-maps",
+  "name": "@repo/domain",
   "type": "module",
   "version": "0.1.0",
   "description": "Socket.io events maps which between client and server.",
