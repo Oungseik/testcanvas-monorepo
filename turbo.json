@@ -1,0 +1,41 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "!.next/cache/**", "dist", ".svelte-kit", "build"]
+    },
+    "lint": {
+      "dependsOn": ["^lint"],
+      "cache": true,
+      "outputs": ["src/**/*"],
+      "inputs": [
+        "src/**/*.{js,ts,jsx,tsx,svelte,mdx}",
+        ".eslintrc.json",
+        "biome.jsonc",
+        "biome.json",
+        "package.json"
+      ]
+    },
+    "check-types": {
+      "dependsOn": ["^check-types"],
+      "cache": true,
+      "inputs": ["src/**/*.{js,ts,jsx,tsx}", "tsconfig.json", "package.json"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "format": {
+      "inputs": ["src/", ".prettierrc", "biome.jsonc"],
+      "outputs": ["src/"],
+      "cache": true
+    },
+    "check": {
+      "outputs": ["src/"],
+      "cache": true
+    }
+  }
+}
