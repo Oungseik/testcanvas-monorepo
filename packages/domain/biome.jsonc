@@ -1,4 +1,11 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "extends": ["@repo/biome-config"]
+  "extends": ["@repo/biome-config"],
+  "linter": {
+    "rules": {
+      "complexity": {
+        "noBannedTypes": "off"
+      }
+    }
+  }
 }
