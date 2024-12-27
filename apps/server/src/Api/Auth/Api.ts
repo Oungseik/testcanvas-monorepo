@@ -15,7 +15,7 @@ const registerTester = HttpApiEndpoint.post("registerTester", "/testers/register
     }),
   );
 
-const loginTester = HttpApiEndpoint.post("loginTester", "/testers/login")
+const loginTester = HttpApiEndpoint.post("loginTester", "/login")
   .setPayload(S.Struct({ email: Email, password: S.String }))
   .addSuccess(S.Struct({ token: S.String }))
   .addError(NotFound)
