@@ -31,7 +31,14 @@ export const AuthApiLive = HttpApiBuilder.group(Api, "authentication", (handlers
       .handle("registerTester", ({ payload }) =>
         hash(payload.password).pipe(
           Ef.flatMap((hash) =>
-            Ef.tryPromise(() => users.insertOne({ ...payload, password: hash })),
+            Ef.tryPromise(() =>
+              users.insertOne({
+                ...payload,
+                password: hash,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              }),
+            ),
           ),
           Ef.andThen(Ef.succeed({ status: "success" as const })),
           Ef.tapError((e) => Ef.sync(() => console.error(e))),
