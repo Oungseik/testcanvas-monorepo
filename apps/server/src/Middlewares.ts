@@ -20,6 +20,7 @@ export function auth(socket: AppSocket, next: (err?: ExtendedError) => void) {
 
     yield* Ef.tryPromise(() => users.findOne({ email })).pipe(
       Ef.flatMap(Ef.fromNullable),
+      Ef.tap((user) => (socket.data.email = user.email)),
       Ef.catchTag("UnknownException", () => new DbError()),
       Ef.andThen(next()),
     );
