@@ -9,6 +9,8 @@ export const User = S.Struct({
   name: S.String,
   email: Email,
   role: Role,
+  createdAt: S.Date,
+  updatedAt: S.Date,
 });
 export type User = typeof User.Type;
 
