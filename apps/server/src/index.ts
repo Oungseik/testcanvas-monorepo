@@ -1,6 +1,6 @@
 import { Config, Effect as Ef } from "effect";
 import { Server } from "socket.io";
-import { InternalServerError, Unauthorized } from "./Errors";
+import { InternalServerError, Unauthorized } from "@repo/api/errors";
 import { auth } from "./Middlewares";
 import { Argon2HashingLive } from "./Services/Hashing";
 import { JwtLive } from "./Services/JsonWebToken";

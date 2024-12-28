@@ -27,6 +27,7 @@
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
+    "@repo/api": "workspace:*",
     "@repo/biome-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/bun": "^1.1.14",

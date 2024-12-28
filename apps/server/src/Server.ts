@@ -4,7 +4,13 @@ import { JwtLive } from "@/Services/JsonWebToken";
 import { HttpApiBuilder, HttpApiSwagger, HttpMiddleware, HttpServer } from "@effect/platform";
 import { NodeHttpServer, NodeRuntime } from "@effect/platform-node";
 import { Layer } from "effect";
-import { ApiLive } from "./Api";
+import { Api } from "@repo/api";
+import { AuthApiLive, CheckHealthApiLive } from "./Http";
+
+export const ApiLive = HttpApiBuilder.api(Api).pipe(
+  Layer.provide(AuthApiLive),
+  Layer.provide(CheckHealthApiLive),
+);
 
 export const HttpLive = HttpApiBuilder.serve(HttpMiddleware.logger).pipe(
   Layer.provide(HttpApiSwagger.layer({ path: "/docs" })),
