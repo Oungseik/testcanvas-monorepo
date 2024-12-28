@@ -1,10 +1,9 @@
-import type { Email } from "./Email";
 import type { User } from "./User";
 
 export type ServerToClientEvents = {};
 
 export type ClientToServerEvents = {
-  "Users:GetInfo": (payload: { email: Email }, callback: (user: User) => void) => void;
+  "Users:GetInfo": (payload: {}, callback: (user: User) => void) => void;
 };
 
 export type InterServerEvents = {};
