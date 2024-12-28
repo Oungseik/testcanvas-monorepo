@@ -3,8 +3,8 @@ import { Argon2HashingLive } from "@/Services/Hashing";
 import { JwtLive } from "@/Services/JsonWebToken";
 import { HttpApiBuilder, HttpApiSwagger, HttpMiddleware, HttpServer } from "@effect/platform";
 import { NodeHttpServer, NodeRuntime } from "@effect/platform-node";
-import { Layer } from "effect";
 import { Api } from "@repo/api";
+import { Layer } from "effect";
 import { AuthApiLive, CheckHealthApiLive } from "./Http";
 
 export const ApiLive = HttpApiBuilder.api(Api).pipe(

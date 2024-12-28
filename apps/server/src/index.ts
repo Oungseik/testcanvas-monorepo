@@ -1,6 +1,7 @@
+import { InternalServerError, Unauthorized } from "@repo/api/errors";
 import { Config, Effect as Ef } from "effect";
 import { Server } from "socket.io";
-import { InternalServerError, Unauthorized } from "@repo/api/errors";
+import { registerUsersHandler } from "./Handlers";
 import { auth } from "./Middlewares";
 import { Argon2HashingLive } from "./Services/Hashing";
 import { JwtLive } from "./Services/JsonWebToken";
@@ -26,6 +27,8 @@ const main = Ef.gen(function* () {
 
   io.on("connection", (socket) => {
     socket.on("error", console.error);
+
+    registerUsersHandler(io, socket);
   });
 
   io.listen(port);

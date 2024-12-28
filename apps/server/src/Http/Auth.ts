@@ -1,10 +1,10 @@
-import { InternalServerError, NotFound, UnprocessableContent } from "@repo/api/errors";
 import { Hashing } from "@/Services/Hashing";
 import { Jwt } from "@/Services/JsonWebToken";
 import { users } from "@/Services/Mongo";
 import { HttpApiBuilder } from "@effect/platform";
-import { Effect as Ef } from "effect";
 import { Api } from "@repo/api";
+import { InternalServerError, NotFound, UnprocessableContent } from "@repo/api/errors";
+import { Effect as Ef } from "effect";
 
 export const AuthApiLive = HttpApiBuilder.group(Api, "authentication", (handlers) =>
   Ef.gen(function* () {
