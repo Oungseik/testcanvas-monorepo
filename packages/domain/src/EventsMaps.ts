@@ -1,5 +1,5 @@
-import type { User } from "./User";
 import type { Email } from "./Email";
+import type { User } from "./User";
 
 const ERROR_CODES = ["NOT_FOUND", "INTERNAL_SERVER_ERROR"] as const;
 export type ErrorCode = (typeof ERROR_CODES)[number];
