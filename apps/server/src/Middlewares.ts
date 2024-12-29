@@ -1,11 +1,10 @@
 import { users } from "@/Services/Mongo";
 import { Effect as Ef } from "effect";
-import type { ExtendedError } from "socket.io";
 import { DbError } from "./Errors";
 import { Jwt, JwtError } from "./Services/JsonWebToken";
 import type { AppSocket } from "./types";
 
-export function auth(socket: AppSocket, next: (err?: ExtendedError) => void) {
+export function auth(socket: AppSocket) {
   const { token } = socket.handshake.auth;
   return Ef.gen(function* () {
     const { verify } = yield* Jwt;
@@ -24,7 +23,6 @@ export function auth(socket: AppSocket, next: (err?: ExtendedError) => void) {
         socket.data.email = user.email;
       }),
       Ef.catchTag("UnknownException", () => new DbError()),
-      Ef.andThen(next()),
     );
   });
 }
