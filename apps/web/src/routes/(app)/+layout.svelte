@@ -7,24 +7,26 @@
 	import Devices from "$lib/components/svg/Devices.svelte";
 	import Monitoring from "$lib/components/svg/Monitoring.svelte";
 	import FileLibrary from "$lib/components/svg/FileLibrary.svelte";
-	import type { Email } from "@repo/domain";
 	import type { LayoutData } from "./$types";
 	import type { Snippet } from "svelte";
 	import { PUBLIC_SOCKET_URL } from "$env/static/public";
 	import { io } from "socket.io-client";
+	import { browser } from "$app/environment";
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
-
-	socket.socket = io(PUBLIC_SOCKET_URL, {
-		transports: ["websocket"],
-		auth: { token: data.token }
-	});
 
 	let hideDrawer =
 		page.url.pathname.startsWith("/monitoring") && page.url.pathname.split("/").length === 3;
 
+	if (browser) {
+		socket.socket = io(PUBLIC_SOCKET_URL, {
+			transports: ["websocket"],
+			auth: { token: data.token }
+		});
+	}
+
 	$effect(() => {
-		socket?.socket?.emit("Users:GetInfo", { email: data.email as Email }, (user) => {
+		socket?.socket?.emit("Users:GetInfo", {}, (user) => {
 			console.log(user);
 		});
 		return () => socket?.socket?.disconnect();
