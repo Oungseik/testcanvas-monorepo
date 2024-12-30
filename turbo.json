@@ -12,13 +12,7 @@
       "dependsOn": ["^lint"],
       "cache": true,
       "outputs": ["src/**/*"],
-      "inputs": [
-        "src/**/*.{js,ts,jsx,tsx,svelte,mdx}",
-        ".eslintrc.json",
-        "biome.jsonc",
-        "biome.json",
-        "package.json"
-      ]
+      "inputs": ["src", ".eslintrc.json", "biome.jsonc", "biome.json", "package.json"]
     },
     "check-types": {
       "dependsOn": ["^check-types"],
