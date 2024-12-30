@@ -17,9 +17,10 @@
       {
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
+            android-tools
+            biome
             bun
             python3
-            biome
           ];
 
           shellHook = '''';
