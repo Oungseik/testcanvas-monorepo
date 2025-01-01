@@ -1,4 +1,4 @@
-import { type UserWithTimeStamps, Android } from "@repo/domain";
+import type { Android, UserWithTimeStamps } from "@repo/domain";
 import { MongoClient } from "mongodb";
 
 export const db = new MongoClient(process.env.MONGO_URL ?? "mongodb://localhost:27017").db(
