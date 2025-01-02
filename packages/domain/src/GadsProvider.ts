@@ -13,7 +13,6 @@ export const AndroidProvider = S.extend(
   Base,
   S.Struct({
     provide_android: S.Literal(true),
-    provide_ios: S.Literal(false),
   }),
 );
 export type AndroidProvider = typeof AndroidProvider.Type;
@@ -21,7 +20,6 @@ export type AndroidProvider = typeof AndroidProvider.Type;
 export const IosProvider = S.extend(
   Base,
   S.Struct({
-    provide_android: S.Literal(false),
     provide_ios: S.Literal(true),
     wda_bundle_id: S.String,
     wda_repo_path: S.String,
