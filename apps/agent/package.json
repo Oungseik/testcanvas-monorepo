@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "agent",
+  "version": "0.1.0",
+  "description": "",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "pnpm run build && pnpm run serve",
+    "build": "tsup",
+    "serve": "node dist/index.cjs",
+    "check": "biome check --write ./src",
+    "format": "biome format --write ./src",
+    "lint": "biome lint --write ./src"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@devicefarmer/adbkit": "^3.3.8",
+    "@effect/platform": "^0.72.0",
+    "@repo/api": "workspace:*",
+    "@repo/domain": "workspace:*",
+    "effect": "^3.12.0",
+    "get-port": "^7.1.0"
+  },
+  "devDependencies": {
+    "@repo/biome-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/bluebird": "^3.5.42",
+    "@types/bun": "^1.1.14",
+    "@types/node": "^22.10.2",
+    "@types/source-map-support": "^0.5.10",
+    "source-map-support": "^0.5.21",
+    "tsup": "^8.3.5"
+  }
+}
