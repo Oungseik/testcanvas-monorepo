@@ -20,6 +20,7 @@
             android-tools
             biome
             bun
+            openjdk21
             python3
           ];
 
