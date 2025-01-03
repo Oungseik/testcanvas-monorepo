@@ -40,4 +40,4 @@ yarn-error.log*
 
 **/*/.databases
 **/*/drizzle
-
+**/*/logs
