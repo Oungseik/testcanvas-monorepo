@@ -5,6 +5,9 @@ import { FetchHttpClient, HttpBody, HttpClient } from "@effect/platform";
 import type { Udid } from "@repo/domain";
 import { Config, Effect as Ef } from "effect";
 
+/** keep device udid with the model name just for logging purpose */
+const deviceMap: Map<Udid, string> = new Map();
+
 /**
  * Get resolution of android device using ADB
  *
@@ -47,7 +50,21 @@ function addAndroid(udid: Udid) {
     }).pipe(
       Ef.andThen((body) => client.post(`${gadsHost}/admin/device`, { body })),
       Ef.andThen((res) => res.json),
-      Ef.tap(Ef.logInfo(`setup device for ${model ?? udid}`)),
+      Ef.tap(() => Ef.succeed(deviceMap.set(udid, model ?? "unknown"))),
+      Ef.tap(Ef.logInfo(`connect device ${model ?? udid}`)),
+    );
+  });
+}
+
+function removeAndroid(udid: Udid) {
+  return Ef.gen(function* () {
+    const gadsHost = yield* Config.string("GADS_URL");
+    const client = yield* HttpClient.HttpClient;
+    const model = deviceMap.get(udid);
+
+    yield* client.del(`${gadsHost}/admin/device/${udid}`).pipe(
+      Ef.andThen((res) => res.json),
+      Ef.tap(Ef.logInfo(`disconnect device ${model ?? udid}`)),
     );
   });
 }
@@ -55,12 +72,15 @@ function addAndroid(udid: Udid) {
 export function trackAndSetupAndroid() {
   AndroidTracker.subscribe(async ({ event, device: { type, id } }) => {
     if ((event === "add" || event === "change") && (type === "device" || type === "emulator")) {
-      const task = addAndroid(id as Udid).pipe();
+      const task = addAndroid(id as Udid);
       // TODO handle the error of the task
       await task.pipe(Ef.scoped, Ef.provide(FetchHttpClient.layer), Ef.runPromise);
     }
 
     if (event === "remove") {
+      const task = removeAndroid(id as Udid);
+      // TODO handle the error of the task
+      await task.pipe(Ef.scoped, Ef.provide(FetchHttpClient.layer), Ef.runPromise);
     }
   });
 }
