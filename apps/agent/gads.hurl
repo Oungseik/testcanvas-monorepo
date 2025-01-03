@@ -29,3 +29,5 @@ POST http://192.168.99.192:8000/admin/device
 }
 HTTP 200
 
+
+GET http://192.168.99.110:8000/health
