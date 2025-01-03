@@ -41,7 +41,7 @@ function addAndroid(udid: Udid) {
       udid,
       name: props["ro.product.model"],
       provider: "AndroidProvider",
-      os_version: props["ro.build.version.release"] ?? "unknwn",
+      os_version: props["ro.build.version.release"] ?? "unknown",
       screen_width,
       screen_height,
       os: "android",
