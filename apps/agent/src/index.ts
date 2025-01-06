@@ -9,6 +9,7 @@ Promise.all([
   setupAndroidProvider().pipe(Ef.scoped, Ef.provide(FetchHttpClient.layer), Ef.runPromise),
   setupIosProvider().pipe(Ef.scoped, Ef.provide(FetchHttpClient.layer), Ef.runPromise),
 ]).then(() => {
+  const gadsURL = process.env.GADS_URL ?? "127.0.0.1:8000";
   // make logs directory, if not exist
   if (!fs.existsSync("logs")) {
     fs.mkdirSync("logs", { recursive: true });
@@ -17,20 +18,22 @@ Promise.all([
   const childAndroid = cp.spawn("gads", [
     "provider",
     "--nickname=AndroidProvider",
-    "--hub=http://192.168.99.192:8000",
+    `--hub=${gadsURL}`,
   ]);
 
   childAndroid.stdout;
   childAndroid.stdout.pipe(fs.createWriteStream("logs/android.log", { encoding: "utf8" }));
   childAndroid.stderr.pipe(fs.createWriteStream("logs/android.error", { encoding: "utf8" }));
+  childAndroid.on("exit", (e) => console.error("AndroidProvider exit with code", e))
 
   const childIos = cp.spawn("gads", [
     "provider",
     "--nickname=IosProvider",
-    "--hub=http://192.168.99.192:8000",
+    `--hub=${gadsURL}`,
   ]);
   childIos.stdout.pipe(fs.createWriteStream("logs/ios.log", { encoding: "utf8" }));
   childIos.stderr.pipe(fs.createWriteStream("logs/ios.error", { encoding: "utf8" }));
+  childAndroid.on("exit", (e) => console.error("AndroidProvider exit with code", e))
 });
 
 trackAndSetupAndroid();
