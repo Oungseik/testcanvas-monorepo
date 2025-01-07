@@ -41,3 +41,6 @@ yarn-error.log*
 **/*/.databases
 **/*/drizzle
 **/*/logs
+
+**/*/AndroidProvider
+**/*/IosProvider

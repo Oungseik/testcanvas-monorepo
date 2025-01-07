@@ -22,6 +22,7 @@
             biome
             bun
             ffmpeg
+            go-ios
             openjdk21
             python3
           ];
