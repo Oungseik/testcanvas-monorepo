@@ -3,7 +3,7 @@ import fs from "node:fs";
 import { FetchHttpClient } from "@effect/platform";
 import { Effect as Ef } from "effect";
 import { setupAndroidProvider, setupIosProvider } from "./Services";
-import { trackAndSetupAndroid } from "./Services/Android";
+import { trackAndSetupAndroid, trackAndSetupIos } from "./Services";
 
 Promise.all([
   setupAndroidProvider().pipe(Ef.scoped, Ef.provide(FetchHttpClient.layer), Ef.runPromise),
@@ -33,7 +33,4 @@ Promise.all([
 });
 
 trackAndSetupAndroid();
-
-import { IosTracker } from "./Trackers";
-
-IosTracker.subscribe((e) => console.log(e));
+trackAndSetupIos();
