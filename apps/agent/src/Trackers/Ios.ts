@@ -1,12 +1,13 @@
 import cp from "node:child_process";
 import { Signal } from "@/Signal";
 import type { Udid } from "@repo/domain";
+import { Data, Effect as Ef } from "effect";
 
 const diff = <T>(xs: T[], ys: T[]) => xs.filter((x) => !ys.includes(x));
 
 type IosEvent = {
   event: "add" | "remove";
-  device: { udid: Udid; type: "real" };
+  device: { id: Udid; type: "real" };
 };
 
 class IosTracker extends Signal<IosEvent> {
@@ -24,12 +25,12 @@ class IosTracker extends Signal<IosEvent> {
           if (device.MessageType === "Attached") {
             this.notify({
               event: "add",
-              device: { udid: device.Properties.SerialNumber as Udid, type: "real" },
+              device: { id: device.Properties.SerialNumber as Udid, type: "real" },
             });
           }
 
           if (device.Message === "Detached") {
-            this.notify({ event: "remove", device: { udid: "unknown" as Udid, type: "real" } });
+            this.notify({ event: "remove", device: { id: "unknown" as Udid, type: "real" } });
           }
         }),
     );
@@ -37,3 +38,36 @@ class IosTracker extends Signal<IosEvent> {
 }
 
 export const tracker = new IosTracker();
+
+
+export class GoIosError extends Data.TaggedError("GoIosError")<{
+  readonly message: string
+}> {}
+
+
+interface IphoneInfo  {
+  name: string;
+  os_version: string;
+}
+
+export function getInfo(udid: Udid) {
+  return Ef.async<IphoneInfo, GoIosError>((resume) => {
+    cp.exec(`ios info --udid=${udid}`, (err, stdout, stderr) => {
+
+      if (err) {
+        return resume(new GoIosError({message: err.message}))
+      }
+
+      if (stderr) {
+        return resume(new GoIosError({message: JSON.parse(stderr).msg ?? "Something went wrong while reading the ios device info" }))
+      }
+
+      const data = JSON.parse(stdout);
+      return resume(Ef.succeed({
+        name: data["DeviceName"],
+        os_version: data["ProductVersion"]
+      }))
+    })
+    
+  })
+}
