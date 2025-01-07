@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { devices } from "$lib/stores/devices.svelte";
 	import { socket } from "$lib/stores/socket.svelte";
 	import { page } from "$app/state";
 	import Logo from "$lib/components/svg/Logo.svelte";
@@ -9,7 +10,7 @@
 	import FileLibrary from "$lib/components/svg/FileLibrary.svelte";
 	import type { LayoutData } from "./$types";
 	import type { Snippet } from "svelte";
-	import { PUBLIC_SOCKET_URL } from "$env/static/public";
+	import { PUBLIC_SOCKET_URL, PUBLIC_GADS_URL } from "$env/static/public";
 	import { io } from "socket.io-client";
 	import { browser } from "$app/environment";
 
@@ -22,6 +23,12 @@
 		socket.socket = io(PUBLIC_SOCKET_URL, {
 			transports: ["websocket"],
 			auth: { token: data.token }
+		});
+
+		const es = new EventSource(`${PUBLIC_GADS_URL}/available-devices`);
+		es.addEventListener("message", (msg) => {
+			const data = JSON.parse(msg.data);
+			devices.value = data;
 		});
 	}
 
