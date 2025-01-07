@@ -24,16 +24,16 @@ Promise.all([
   childAndroid.stdout;
   childAndroid.stdout.pipe(fs.createWriteStream("logs/android.log", { encoding: "utf8" }));
   childAndroid.stderr.pipe(fs.createWriteStream("logs/android.error", { encoding: "utf8" }));
-  childAndroid.on("exit", (e) => console.error("AndroidProvider exit with code", e))
+  childAndroid.on("exit", (e) => console.error("AndroidProvider exit with code", e));
 
-  const childIos = cp.spawn("gads", [
-    "provider",
-    "--nickname=IosProvider",
-    `--hub=${gadsURL}`,
-  ]);
+  const childIos = cp.spawn("gads", ["provider", "--nickname=IosProvider", `--hub=${gadsURL}`]);
   childIos.stdout.pipe(fs.createWriteStream("logs/ios.log", { encoding: "utf8" }));
   childIos.stderr.pipe(fs.createWriteStream("logs/ios.error", { encoding: "utf8" }));
-  childAndroid.on("exit", (e) => console.error("AndroidProvider exit with code", e))
+  childAndroid.on("exit", (e) => console.error("AndroidProvider exit with code", e));
 });
 
 trackAndSetupAndroid();
+
+import { IosTracker } from "./Trackers";
+
+IosTracker.subscribe((e) => console.log(e));
