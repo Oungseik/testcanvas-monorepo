@@ -36,14 +36,8 @@ function addIos(udid: Udid) {
 
 function removeIos(udid: Udid) {
   return Ef.gen(function* () {
-    const gadsHost = yield* Config.string("GADS_URL");
-    const client = yield* HttpClient.HttpClient;
     const name = deviceMap.get(udid);
-
-    yield* client.del(`${gadsHost}/admin/device/${udid}`).pipe(
-      Ef.andThen((res) => res.json),
-      Ef.tap(Ef.logInfo(`disconnect device ${name ?? udid}`)),
-    );
+    yield* Ef.logInfo(`disconnect device ${name ?? udid}`);
   });
 }
 
