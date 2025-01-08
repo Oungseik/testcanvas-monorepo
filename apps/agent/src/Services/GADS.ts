@@ -62,7 +62,9 @@ export function setupIosProvider() {
     const wda_bundle_id = yield* Config.string("WDA_BUNDLE_ID");
     const wda_repo_path = yield* Config.string("WDA_REPO_PATH");
     const use_custom_wda = yield* Config.boolean("USE_CUSTOM_WDA");
-    const supervision_password = yield* Config.string("SUPERVISION_PASSWORD").pipe(Config.withDefault(undefined));
+    const supervision_password = yield* Config.string("SUPERVISION_PASSWORD").pipe(
+      Config.withDefault(undefined),
+    );
 
     const providers = (yield* client
       .get(`${gadsHost}/admin/providers`)
@@ -81,11 +83,11 @@ export function setupIosProvider() {
       nickname,
       os,
       port,
-      supervision_password, 
+      supervision_password,
       provide_ios: true,
       wda_bundle_id,
       wda_repo_path,
-      use_custom_wda, 
+      use_custom_wda,
       use_selenium_grid: true,
       selenium_grid,
       host_address,
@@ -97,5 +99,4 @@ export function setupIosProvider() {
       })
       .pipe(Ef.tap(Ef.logInfo(`successfully setup ${nickname}`)));
   });
-
 }

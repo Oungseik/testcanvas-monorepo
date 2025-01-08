@@ -7,7 +7,7 @@ import { trackAndSetupAndroid, trackAndSetupIos } from "./Services";
 
 Promise.all([
   setupAndroidProvider().pipe(Ef.scoped, Ef.provide(FetchHttpClient.layer), Ef.runPromise),
-  setupIosProvider().pipe(Ef.scoped, Ef.provide(FetchHttpClient.layer), Ef.runPromise),
+  // setupIosProvider().pipe(Ef.scoped, Ef.provide(FetchHttpClient.layer), Ef.runPromise),
 ]).then(() => {
   const gadsURL = process.env.GADS_URL ?? "127.0.0.1:8000";
   // make logs directory, if not exist
@@ -33,4 +33,4 @@ Promise.all([
 });
 
 trackAndSetupAndroid();
-trackAndSetupIos();
+// trackAndSetupIos();
