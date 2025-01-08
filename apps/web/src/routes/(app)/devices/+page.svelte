@@ -1,11 +1,6 @@
 <script lang="ts">
 	import { devices } from "$lib/stores/devices.svelte";
 	import Mobile from "$lib/components/svg/Mobile.svelte";
-	$inspect(devices.value);
-
-	function showModal(id: string) {
-	  (document.getElementById(id) as HTMLDialogElement).showModal();
-	}
 </script>
 
 <section class="px-4">
@@ -18,27 +13,20 @@
 	<div class="divider mt-0"></div>
 </section>
 <section class="grid grid-cols-3 gap-4 px-4 xl:grid-cols-5">
-	  {#each devices.value as d, i (d.info.udid)}
-	    <button
-	      class="btn h-auto shadow-md rounded-md flex flex-row justify-between flex-nowrap font-normal pl-4 pr-0 py-4 text-left"
-	      onclick={() => showModal(`my_modal_${i}`)}>
-	      <div>
-	        <h2 class="text-lg font-bold">{d.info.name }</h2>
-	        <p class="text-sm">{d.info.os} {d.info.os_version}</p>
-	        <div class={"badge badge-outline mt-4 p-3" + (d.available ? " badge-success" : " badge-error")}>{d.available ? "Available" : "Offline" }</div>
-	      </div>
-	      <Mobile width="6rem" height="6rem" />
-	    </button>
-	  {/each}
+	{#each devices.value as d (d.info.udid)}
+		<div
+			class="flex h-auto flex-row flex-nowrap justify-between rounded-md py-4 pl-4 pr-0 text-left font-normal shadow-md"
+		>
+			<div>
+				<h2 class="text-lg font-bold">{d.info.name}</h2>
+				<p class="text-sm">{d.info.os} {d.info.os_version}</p>
+				<a
+					href={`/control/${d.info.udid}`}
+					class={"btn mt-4" + (d.available ? " btn-success" : " btn-disable opacity-50")}
+					>{d.available ? "Available" : "Offline"}</a
+				>
+			</div>
+			<Mobile width="6rem" height="6rem" />
+		</div>
+	{/each}
 </section>
-
-<!-- Open the modal using ID.showModal() method -->
-<dialog id="my_modal_0" class="modal">
-	<div class="modal-box">
-		<h3 class="text-lg font-bold">Hello!</h3>
-		<p class="py-4">Press ESC key or click outside to close</p>
-	</div>
-	<form method="dialog" class="modal-backdrop">
-		<button>close</button>
-	</form>
-</dialog>
