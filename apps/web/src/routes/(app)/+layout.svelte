@@ -38,6 +38,8 @@
 		});
 		return () => socket?.socket?.disconnect();
 	});
+
+	const hiddenSidebar = $derived(page.url.pathname.includes("control"));
 </script>
 
 <div class={"drawer" + (hideDrawer ? "" : " drawer-open")}>
@@ -50,7 +52,9 @@
 	</div>
 	<div class="drawer-side">
 		<label for="main-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-		<div class="menu flex min-h-full w-60 flex-col gap-8 bg-base-200 p-4 text-base-content">
+		<div
+			class={`menu min-h-full w-60 gap-8 bg-base-200 p-4 text-base-content ${hiddenSidebar ? "hidden" : "flex flex-col"}`}
+		>
 			<!-- Sidebar content here -->
 			<h1 class="text-2xl font-bold">
 				<Logo class="inline-block" width="3rem" height="3rem" />logo
