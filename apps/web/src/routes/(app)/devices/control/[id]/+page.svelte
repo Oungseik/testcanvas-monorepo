@@ -2,38 +2,33 @@
 	import { browser } from "$app/environment";
 	import { page } from "$app/state";
 	import { PUBLIC_GADS_URL } from "$env/static/public";
-	import { devices } from "$lib/stores/devices.svelte";
 	import { onMount } from "svelte";
+	import type { PageServerData } from "./$types";
+
+	const { data }: { data: PageServerData } = $props();
 
 	let shouldShowStream = $state(false);
 
 	const udid = page.params.id;
-	const device = $derived(devices.value.find((d) => d.info.udid === udid)!);
-	let imageWidth: number = $derived(Number(device?.info.screen_width) / 2.4);
+	let imageWidth: number = $derived(Number(data.info.screen_width) / 2.4);
 	let imageHeight: number = $derived(
-		(imageWidth * Number(device?.info.screen_height)) / Number(device?.info.screen_width)
+		(imageWidth * Number(data.info.screen_height)) / Number(data.info.screen_width)
 	);
 
 	onMount(() => {
 		let socket: WebSocket;
 		if (browser) {
 			const protocol = window.location.protocol;
-			const wsType = protocol === "http" ? "ws" : "wss";
-			socket = new WebSocket(`${wsType}://${window.location.host}/devices/control/${udid}/in-use`);
+			const socketUrl = new URL(PUBLIC_GADS_URL);
+			socketUrl.protocol = protocol === "https" ? "wss" : "ws";
+			socketUrl.pathname = `/devices/control/${udid}/in-use`;
+			socket = new WebSocket(socketUrl);
 
-			socket.onopen = () => {
-				console.log("In Use WebSocket connection opened");
-			};
+			socket.addEventListener("open", () => console.log("In Use WebSocket connection opened"));
+			socket.addEventListener("close", () => console.log("In Use WebSocket connection closed"));
+			socket.addEventListener("error", (error) => console.error("In Use WebSocket error:", error));
 
-			socket.onclose = () => {
-				console.log("In Use WebSocket connection closed");
-			};
-
-			socket.onerror = (error) => {
-				console.error("In Use WebSocket error:", error);
-			};
-
-			socket.onmessage = (event) => {
+			socket.addEventListener("message", (event) => {
 				if (socket.readyState === WebSocket.OPEN) {
 					const message = JSON.parse(event.data);
 					switch (message.type) {
@@ -50,7 +45,7 @@
 							break;
 					}
 				}
-			};
+			});
 		}
 		return () => {
 			socket?.close();
@@ -66,14 +61,12 @@
 					class="artboard artboard-demo rounded-xl border-4 border-base-content"
 					style={`width: ${imageWidth}px; height: ${imageHeight}px`}
 				>
-					{#if device}
-						<img
-							class="block h-full w-full rounded-lg"
-							src={`${PUBLIC_GADS_URL}/device/${udid}/${device?.info.os}-stream-mjpeg`}
-							alt="streaming device screen"
-							draggable="false"
-						/>
-					{/if}
+					<img
+						class="block h-full w-full rounded-lg"
+						src={`${PUBLIC_GADS_URL}/device/${udid}/${data.info.os}-stream-mjpeg`}
+						alt="streaming device screen"
+						draggable="false"
+					/>
 				</div>
 			</div>
 		</div>
