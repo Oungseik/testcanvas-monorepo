@@ -27,7 +27,7 @@
 				<h2 class="text-lg font-bold">{d.info.name}</h2>
 				<p class="text-sm">{d.info.os} {d.info.os_version}</p>
 				{#if d.available}
-					<a href={`/devices/control/${d.info.udid}`} class="btn btn-success mt-4">"Available"</a>
+					<a href={`/devices/control/${d.info.udid}`} class="btn btn-success mt-4">Available</a>
 				{/if}
 				{#if !d.available}
 					<div class="btn-disable btn mt-4 opacity-70">Offline</div>
