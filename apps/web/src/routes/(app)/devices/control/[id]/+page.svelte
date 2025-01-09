@@ -5,15 +5,20 @@
 	import { onMount } from "svelte";
 	import type { PageServerData } from "./$types";
 
+	const RESIZE_RATIO = 2.4;
 	const { data }: { data: PageServerData } = $props();
+	const udid = page.params.id;
 
 	let shouldShowStream = $state(false);
+	let screen: HTMLDivElement;
+	let cachedRect: DOMRect;
+	let deviceX = Number(data.info.screen_width);
+	let deviceY = Number(data.info.screen_height);
+	let isPortrait = $state(true);
 
-	const udid = page.params.id;
-	let imageWidth: number = $derived(Number(data.info.screen_width) / 2.4);
-	let imageHeight: number = $derived(
-		(imageWidth * Number(data.info.screen_height)) / Number(data.info.screen_width)
-	);
+	let imageWidth: number = Number(data.info.screen_width) / RESIZE_RATIO;
+	let imageHeight: number =
+		(imageWidth * Number(data.info.screen_height)) / Number(data.info.screen_width);
 
 	onMount(() => {
 		let socket: WebSocket;
@@ -27,38 +32,112 @@
 			socket.addEventListener("open", () => console.info("In Use WebSocket connection opened"));
 			socket.addEventListener("close", () => console.info("In Use WebSocket connection closed"));
 			socket.addEventListener("error", (error) => console.error("In Use WebSocket error:", error));
-
 			socket.addEventListener("message", (event) => {
 				if (socket.readyState === WebSocket.OPEN) {
 					const message = JSON.parse(event.data);
-					switch (message.type) {
-						case "ping":
-							socket.send("admin");
-							break;
-						case "releaseDevice":
-							shouldShowStream = false;
-							socket?.close();
-							break;
-						case "sessionExpired":
-							shouldShowStream = false;
-							socket?.close();
-							break;
+					if (message.type === "ping") {
+						socket.send("admin");
+					} else if (message.type === "releaseDevice") {
+						shouldShowStream = false;
+						socket?.close();
+					} else if (message.type === "sessionExpired") {
+						shouldShowStream = false;
+						socket?.close();
 					}
 				}
 			});
 		}
-		return () => {
-			socket?.close();
-		};
+
+		cachedRect = screen.getBoundingClientRect();
+		return () => socket?.close();
 	});
+
+	function getCursorCoord(
+		e: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }
+	): [number, number] {
+		const absoluteX = Math.round(e.clientX - cachedRect.left);
+		const absoluteY = Math.round(e.clientY - cachedRect.top);
+		const x = absoluteX / cachedRect.width;
+		const y = absoluteY / cachedRect.height;
+		return [x, y];
+	}
+
+	let tapStartAt: number;
+	let tapEndAt: number;
+	let coord1: [number, number];
+	let coord2: [number, number];
+
+	function handleMouseDown(e: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) {
+		tapStartAt = new Date().getTime();
+		coord1 = getCursorCoord(e);
+	}
+
+	function handleMouseUp(e: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) {
+		tapEndAt = new Date().getTime();
+		coord2 = getCursorCoord(e);
+		const mouseEventsTimeDiff = tapEndAt - tapStartAt;
+		if (
+			(mouseEventsTimeDiff > 500 && coord2[0] > coord1[0] * 1.1) ||
+			coord2[0] < coord1[0] * 0.9 ||
+			coord2[1] < coord1[1] * 0.9 ||
+			coord2[1] > coord1[1] * 1.1
+		) {
+			// swipeCoordinates(coord1, coord2);
+		} else if (mouseEventsTimeDiff < 500) {
+			tapCoordinates(coord1);
+		} else {
+			// touchAndHoldCoordinates(coord1);
+		}
+	}
+
+	function tapCoordinates(pos: [number, number]) {
+		// set initial x and y tap coordinates
+		let x = pos[0];
+		let y = pos[1];
+		let finalX: number;
+		let finalY: number;
+
+		if (isPortrait) {
+			finalX = x * deviceX;
+			finalY = y * deviceY;
+		} else {
+			finalX = x * deviceY;
+			finalY = y * deviceX;
+		}
+
+		let body = JSON.stringify({
+			x: finalX,
+			y: finalY
+		});
+
+		fetch(`${PUBLIC_GADS_URL}/device/${udid}/tap`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body
+		}).catch((error) => {
+			if (error.response) {
+				if (error.response.status === 404) {
+					// showCustomSnackbarError('Tap failed - Appium session has expired!')
+				} else {
+					// showCustomSnackbarError('Tap failed!')
+				}
+			} else {
+				// showCustomSnackbarError('Tap failed!')
+			}
+		});
+	}
 </script>
 
 <div class="grid min-h-dvh grid-cols-3">
 	<div class="col-span-2 mx-auto my-8">
 		<div>
 			<div class="display">
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<div
-					class="artboard artboard-demo rounded-xl border-4 border-base-content"
+					bind:this={screen}
+					onmousedown={handleMouseDown}
+					onmouseup={handleMouseUp}
+					class="artboard artboard-demo relative rounded-xl border-4 border-base-content"
 					style={`width: ${imageWidth}px; height: ${imageHeight}px`}
 				>
 					<img
