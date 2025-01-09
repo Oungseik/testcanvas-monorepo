@@ -1,13 +1,19 @@
 <script lang="ts">
 	import { devices } from "$lib/stores/devices.svelte";
 	import Mobile from "$lib/components/svg/Mobile.svelte";
+
+  const availableDevices = $derived(devices.value.filter(d => d.available));
 </script>
 
 <section class="px-4">
-	<div>
+	<div class="flex gap-8">
 		<p class="text-sm opacity-50">
-			TOTAL: {0}
-			{"DEVICES"}
+			TOTAL: {devices.value.length}
+			{devices.value.length === 1 ? "DEVICE" : "DEVICES"}
+		</p>
+		<p class="text-sm opacity-50">
+			AVAILABLE: {availableDevices.length}
+			{availableDevices.length === 1 ? "DEVICE" : "DEVICES"}
 		</p>
 	</div>
 	<div class="divider mt-0"></div>

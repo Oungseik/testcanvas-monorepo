@@ -24,8 +24,8 @@
 			socketUrl.pathname = `/devices/control/${udid}/in-use`;
 			socket = new WebSocket(socketUrl);
 
-			socket.addEventListener("open", () => console.log("In Use WebSocket connection opened"));
-			socket.addEventListener("close", () => console.log("In Use WebSocket connection closed"));
+			socket.addEventListener("open", () => console.info("In Use WebSocket connection opened"));
+			socket.addEventListener("close", () => console.info("In Use WebSocket connection closed"));
 			socket.addEventListener("error", (error) => console.error("In Use WebSocket error:", error));
 
 			socket.addEventListener("message", (event) => {
