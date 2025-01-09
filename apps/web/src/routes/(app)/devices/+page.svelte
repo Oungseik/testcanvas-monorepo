@@ -2,7 +2,7 @@
 	import { devices } from "$lib/stores/devices.svelte";
 	import Mobile from "$lib/components/svg/Mobile.svelte";
 
-  const availableDevices = $derived(devices.value.filter(d => d.available));
+	const availableDevices = $derived(devices.value.filter((d) => d.available));
 </script>
 
 <section class="px-4">
@@ -26,11 +26,12 @@
 			<div>
 				<h2 class="text-lg font-bold">{d.info.name}</h2>
 				<p class="text-sm">{d.info.os} {d.info.os_version}</p>
-				<a
-					href={`/devices/control/${d.info.udid}`}
-					class={"btn mt-4" + (d.available ? " btn-success" : " btn-disable opacity-50")}
-					>{d.available ? "Available" : "Offline"}</a
-				>
+				{#if d.available}
+					<a href={`/devices/control/${d.info.udid}`} class="btn btn-success mt-4">"Available"</a>
+				{/if}
+				{#if !d.available}
+					<div class="btn-disable btn mt-4 opacity-70">Offline</div>
+				{/if}
 			</div>
 			<Mobile width="6rem" height="6rem" />
 		</div>
