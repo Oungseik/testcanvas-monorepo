@@ -13,6 +13,7 @@
 	import { PUBLIC_SOCKET_URL, PUBLIC_GADS_URL } from "$env/static/public";
 	import { io } from "socket.io-client";
 	import { browser } from "$app/environment";
+	import { onMount } from "svelte";
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
@@ -24,19 +25,25 @@
 			transports: ["websocket"],
 			auth: { token: data.token }
 		});
+	}
 
+	onMount(() => {
 		const es = new EventSource(`${PUBLIC_GADS_URL}/available-devices`);
 		es.addEventListener("message", (msg) => {
 			const data = JSON.parse(msg.data);
 			devices.value = data;
 		});
-	}
 
-	$effect(() => {
 		socket?.socket?.emit("Users:GetInfo", {}, (user) => {
 			console.log(user);
 		});
-		return () => socket?.socket?.disconnect();
+
+		console.log("mount");
+		return () => {
+			socket?.socket?.disconnect();
+			es.close();
+			console.log("unmount");
+		};
 	});
 
 	const hiddenSidebar = $derived(page.url.pathname.includes("control"));

@@ -35,15 +35,14 @@
 			}
 		};
 
-    // only trigger after ready, if not the health check was cancelled.
-			image.src = "";
-			updateCanvasDimensions();
-			image.src = streamUrl;
+		// only trigger after ready, if not the health check was cancelled.
+		image.src = "";
+		updateCanvasDimensions();
+		image.src = streamUrl;
 
-			window.addEventListener("resize", updateCanvasDimensions);
+		window.addEventListener("resize", updateCanvasDimensions);
 
 		return () => {
-			window.stop();
 			window.removeEventListener("resize", updateCanvasDimensions);
 		};
 	});
