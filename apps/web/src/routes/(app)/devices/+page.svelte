@@ -30,7 +30,7 @@
 					<a href={`/devices/control/${d.info.udid}`} class="btn btn-success mt-4">Available</a>
 				{/if}
 				{#if !d.available}
-					<div class="btn-disable btn mt-4 opacity-70">Offline</div>
+					<div class="btn-disable btn mt-4 cursor-not-allowed opacity-70">Offline</div>
 				{/if}
 			</div>
 			<Mobile width="6rem" height="6rem" />

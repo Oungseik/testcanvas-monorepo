@@ -76,19 +76,62 @@
 		tapEndAt = new Date().getTime();
 		coord2 = getCursorCoord(e);
 		const mouseEventsTimeDiff = tapEndAt - tapStartAt;
-		if (
-			(mouseEventsTimeDiff > 500 && coord2[0] > coord1[0] * 1.1) ||
-			coord2[0] < coord1[0] * 0.9 ||
-			coord2[1] < coord1[1] * 0.9 ||
-			coord2[1] > coord1[1] * 1.1
-		) {
-			// swipeCoordinates(coord1, coord2);
+
+		if (mouseEventsTimeDiff > 300 && Math.abs(coord2[0] - coord1[0] ) > 0.1 || Math.abs(coord2[1] - coord1[1] ) > 0.1) {
+			swipeCoordinates(coord1, coord2);
 		} else if (mouseEventsTimeDiff < 500) {
 			tapCoordinates(coord1);
 		} else {
-			// touchAndHoldCoordinates(coord1);
+			touchAndHoldCoordinates(coord1);
 		}
 	}
+
+  function swipeCoordinates(coord1: [number, number], coord2: [number, number]) {
+		let x1 = coord1[0];
+		let y1 = coord1[1];
+		let x2 = coord2[0];
+		let y2 = coord2[1];
+		let finalX1: number;
+		let finalY1: number;
+		let finalX2: number;
+		let finalY2: number;
+
+		if (isPortrait) {
+			finalX1 = x1 * deviceX;
+			finalY1 = y1 * deviceY;
+			finalX2 = x2 * deviceX;
+			finalY2 = y2 * deviceY;
+		} else {
+			finalX1 = x1 * deviceY;
+			finalY1 = y1 * deviceX;
+			finalX2 = x2 * deviceY;
+			finalY2 = y2 * deviceX;
+		}
+
+		let body = JSON.stringify({
+			x: finalX1,
+			y: finalY1,
+      endX: finalX2,
+      endY: finalY2
+		});
+
+		fetch(`${PUBLIC_GADS_URL}/device/${udid}/swipe`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body
+		}).catch((error) => {
+			if (error.response) {
+				if (error.response.status === 404) {
+					// showCustomSnackbarError('Swipe failed - Appium session has expired!')
+				} else {
+					// showCustomSnackbarError('Swipe failed!')
+				}
+			} else {
+				// showCustomSnackbarError('Swipe failed!')
+			}
+		});
+    
+  }
 
 	function tapCoordinates(pos: [number, number]) {
 		// set initial x and y tap coordinates
@@ -123,6 +166,42 @@
 				}
 			} else {
 				// showCustomSnackbarError('Tap failed!')
+			}
+		});
+	}
+
+	function touchAndHoldCoordinates(pos: [number, number]) {
+		let x = pos[0];
+		let y = pos[1];
+		let finalX: number;
+		let finalY: number;
+
+		if (isPortrait) {
+			finalX = x * deviceX;
+			finalY = y * deviceY;
+		} else {
+			finalX = x * deviceY;
+			finalY = y * deviceX;
+		}
+
+		let body = JSON.stringify({
+			x: finalX,
+			y: finalY
+		});
+
+		fetch(`${PUBLIC_GADS_URL}/device/${udid}/touchAndHold`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body
+		}).catch((error) => {
+			if (error.response) {
+				if (error.response.status === 404) {
+					// showCustomSnackbarError('Touch & Hold failed - Appium session has expired!')
+				} else {
+					// showCustomSnackbarError('Touch & Hold failed!')
+				}
+			} else {
+				// showCustomSnackbarError('Touch & Hold failed!')
 			}
 		});
 	}
