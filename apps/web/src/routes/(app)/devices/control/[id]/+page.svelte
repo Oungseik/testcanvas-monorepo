@@ -10,16 +10,43 @@
 	const udid = page.params.id;
 	const isReady = fetch(`${PUBLIC_GADS_URL}/device/${udid}/health`);
 
-	let shouldShowStream = $state(false);
 	let screen: HTMLDivElement;
+	let image: HTMLImageElement;
 	let cachedRect: DOMRect;
 	let deviceX = Number(data.info.screen_width);
 	let deviceY = Number(data.info.screen_height);
 	let isPortrait = $state(true);
 
-	let imageWidth: number = Number(data.info.screen_width) / RESIZE_RATIO;
-	let imageHeight: number =
-		(imageWidth * Number(data.info.screen_height)) / Number(data.info.screen_width);
+	let streamUrl = `${PUBLIC_GADS_URL}/device/${udid}/${data.info.os}-stream-mjpeg`;
+
+	let imageWidth = $state(0);
+	let imageHeight = $state(0);
+
+	$effect(() => {
+		const updateCanvasDimensions = () => {
+			if (isPortrait) {
+				imageWidth = Number(data.info.screen_width) / RESIZE_RATIO;
+				imageHeight =
+					(imageWidth * Number(data.info.screen_height)) / Number(data.info.screen_width);
+			} else {
+				imageHeight = Number(data.info.screen_width) / RESIZE_RATIO;
+				imageWidth =
+					(imageWidth * Number(data.info.screen_height)) / Number(data.info.screen_width);
+			}
+			cachedRect = screen.getBoundingClientRect();
+		};
+
+		image.src = "";
+		updateCanvasDimensions();
+		image.src = streamUrl;
+
+		window.addEventListener("resize", updateCanvasDimensions);
+
+		return () => {
+			window.stop();
+			window.removeEventListener("resize", updateCanvasDimensions);
+		};
+	});
 
 	onMount(() => {
 		let socket: WebSocket;
@@ -39,10 +66,8 @@
 					if (message.type === "ping") {
 						socket.send("admin");
 					} else if (message.type === "releaseDevice") {
-						shouldShowStream = false;
 						socket?.close();
 					} else if (message.type === "sessionExpired") {
-						shouldShowStream = false;
 						socket?.close();
 					}
 				}
@@ -231,8 +256,9 @@
 					style={`width: ${imageWidth}px; height: ${imageHeight}px`}
 				>
 					<img
+						bind:this={image}
 						class="block h-full w-full rounded-lg"
-						src={`${PUBLIC_GADS_URL}/device/${udid}/${data.info.os}-stream-mjpeg`}
+						src={streamUrl}
 						alt="streaming device screen"
 						draggable="false"
 					/>
