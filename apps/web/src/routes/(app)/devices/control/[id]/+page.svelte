@@ -13,7 +13,6 @@
 
 	let screen: HTMLDivElement;
 	let image: HTMLImageElement;
-	let cachedRect: DOMRect;
 	let deviceX = Number(data.info.screen_width);
 	let deviceY = Number(data.info.screen_height);
 	let isPortrait = $state(true);
@@ -23,7 +22,7 @@
 	let imageWidth = $state(0);
 	let imageHeight = $state(0);
 
-	$effect(() => {
+	onMount(() => {
 		const updateCanvasDimensions = () => {
 			if (isPortrait) {
 				imageWidth = Number(data.info.screen_width) / RESIZE_RATIO;
@@ -34,17 +33,14 @@
 				imageWidth =
 					(imageWidth * Number(data.info.screen_height)) / Number(data.info.screen_width);
 			}
-			cachedRect = screen.getBoundingClientRect();
 		};
 
     // only trigger after ready, if not the health check was cancelled.
-		isReady.then(() => {
 			image.src = "";
 			updateCanvasDimensions();
 			image.src = streamUrl;
 
 			window.addEventListener("resize", updateCanvasDimensions);
-		});
 
 		return () => {
 			window.stop();
@@ -78,13 +74,13 @@
 			});
 		}
 
-		cachedRect = screen.getBoundingClientRect();
 		return () => socket?.close();
 	});
 
 	function getCursorCoord(
 		e: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }
 	): [number, number] {
+		const cachedRect = screen.getBoundingClientRect();
 		const absoluteX = Math.round(e.clientX - cachedRect.left);
 		const absoluteY = Math.round(e.clientY - cachedRect.top);
 		const x = absoluteX / cachedRect.width;
