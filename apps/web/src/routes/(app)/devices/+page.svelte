@@ -26,7 +26,11 @@
 			<div>
 				<h2 class="text-lg font-bold">{d.info.name}</h2>
 				<p class="text-sm">{d.info.os} {d.info.os_version}</p>
-				{#if d.available}
+				{#if d.available && d.in_use}
+					<div class="btn btn-warning mt-4 cursor-not-allowed opacity-70">In use</div>
+				{/if}
+
+				{#if d.available && !d.in_use}
 					<a href={`/devices/control/${d.info.udid}`} class="btn btn-success mt-4">Available</a>
 				{/if}
 				{#if !d.available}
