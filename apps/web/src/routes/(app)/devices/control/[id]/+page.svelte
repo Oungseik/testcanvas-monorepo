@@ -4,6 +4,7 @@
 	import { PUBLIC_GADS_URL } from "$env/static/public";
 	import { onMount } from "svelte";
 	import type { PageServerData } from "./$types";
+	import Control from "./Control.svelte";
 
 	const RESIZE_RATIO = 2.4;
 	const { data }: { data: PageServerData } = $props();
@@ -36,11 +37,14 @@
 			cachedRect = screen.getBoundingClientRect();
 		};
 
-		image.src = "";
-		updateCanvasDimensions();
-		image.src = streamUrl;
+    // only trigger after ready, if not the health check was cancelled.
+		isReady.then(() => {
+			image.src = "";
+			updateCanvasDimensions();
+			image.src = streamUrl;
 
-		window.addEventListener("resize", updateCanvasDimensions);
+			window.addEventListener("resize", updateCanvasDimensions);
+		});
 
 		return () => {
 			window.stop();
@@ -244,6 +248,9 @@
 			<p class="loading loading-dots loading-lg mt-4"></p>
 		</div>
 	{/await}
+	<div class="absolute left-4 top-1/4">
+		<Control {udid} />
+	</div>
 	<div class="col-span-2 mx-auto my-8">
 		<div>
 			<div class="display">
