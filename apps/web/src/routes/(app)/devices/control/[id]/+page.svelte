@@ -8,6 +8,7 @@
 	const RESIZE_RATIO = 2.4;
 	const { data }: { data: PageServerData } = $props();
 	const udid = page.params.id;
+	const isReady = fetch(`${PUBLIC_GADS_URL}/device/${udid}/health`);
 
 	let shouldShowStream = $state(false);
 	let screen: HTMLDivElement;
@@ -77,7 +78,10 @@
 		coord2 = getCursorCoord(e);
 		const mouseEventsTimeDiff = tapEndAt - tapStartAt;
 
-		if (mouseEventsTimeDiff > 300 && Math.abs(coord2[0] - coord1[0] ) > 0.1 || Math.abs(coord2[1] - coord1[1] ) > 0.1) {
+		if (
+			(mouseEventsTimeDiff > 300 && Math.abs(coord2[0] - coord1[0]) > 0.1) ||
+			Math.abs(coord2[1] - coord1[1]) > 0.1
+		) {
 			swipeCoordinates(coord1, coord2);
 		} else if (mouseEventsTimeDiff < 500) {
 			tapCoordinates(coord1);
@@ -86,7 +90,7 @@
 		}
 	}
 
-  function swipeCoordinates(coord1: [number, number], coord2: [number, number]) {
+	function swipeCoordinates(coord1: [number, number], coord2: [number, number]) {
 		let x1 = coord1[0];
 		let y1 = coord1[1];
 		let x2 = coord2[0];
@@ -111,8 +115,8 @@
 		let body = JSON.stringify({
 			x: finalX1,
 			y: finalY1,
-      endX: finalX2,
-      endY: finalY2
+			endX: finalX2,
+			endY: finalY2
 		});
 
 		fetch(`${PUBLIC_GADS_URL}/device/${udid}/swipe`, {
@@ -130,8 +134,7 @@
 				// showCustomSnackbarError('Swipe failed!')
 			}
 		});
-    
-  }
+	}
 
 	function tapCoordinates(pos: [number, number]) {
 		// set initial x and y tap coordinates
@@ -207,7 +210,15 @@
 	}
 </script>
 
-<div class="grid min-h-dvh grid-cols-3">
+<div class="relative grid min-h-dvh grid-cols-3">
+	{#await isReady}
+		<div
+			class="absolute left-0 top-0 z-10 flex h-full w-full items-center justify-center gap-4 bg-base-300/40"
+		>
+			<p class="text-4xl">Loading</p>
+			<p class="loading loading-dots loading-lg mt-4"></p>
+		</div>
+	{/await}
 	<div class="col-span-2 mx-auto my-8">
 		<div>
 			<div class="display">
