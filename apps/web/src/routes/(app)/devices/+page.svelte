@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { devices } from "$lib/stores/devices.svelte";
-	import Mobile from "$lib/components/svg/Mobile.svelte";
+import { devices } from "$lib/stores/devices.svelte";
+import Mobile from "$lib/components/svg/Mobile.svelte";
 
-	const availableDevices = $derived(devices.value.filter((d) => d.available));
+const availableDevices = $derived(devices.value.filter((d) => d.available));
 </script>
 
 <section class="px-4">
@@ -26,15 +26,14 @@
 			<div>
 				<h2 class="text-lg font-bold">{d.info.name}</h2>
 				<p class="text-sm">{d.info.os} {d.info.os_version}</p>
-				{#if d.available && d.in_use}
-					<div class="btn btn-warning mt-4 cursor-not-allowed opacity-70">In use</div>
-				{/if}
-
-				{#if d.available && !d.in_use}
-					<a href={`/devices/control/${d.info.udid}`} class="btn btn-success mt-4">Available</a>
-				{/if}
 				{#if !d.available}
 					<div class="btn-disable btn mt-4 cursor-not-allowed opacity-70">Offline</div>
+				{:else if d.is_running_automation}
+					<div class="btn btn-warning mt-4 cursor-not-allowed opacity-70">Running Automation</div>
+				{:else if d.in_use}
+					<div class="btn btn-warning mt-4 cursor-not-allowed opacity-70">In use</div>
+				{:else if !d.in_use}
+					<a href={`/devices/control/${d.info.udid}`} class="btn btn-success mt-4">Available</a>
 				{/if}
 			</div>
 			<Mobile width="6rem" height="6rem" />
