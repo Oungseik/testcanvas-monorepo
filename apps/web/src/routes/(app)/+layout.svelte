@@ -38,11 +38,9 @@
 			console.log(user);
 		});
 
-		console.log("mount");
 		return () => {
 			socket?.socket?.disconnect();
 			es.close();
-			console.log("unmount");
 		};
 	});
 
