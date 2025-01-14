@@ -8,6 +8,7 @@
     "dev:auth": "bun run src/Server.ts",
     "dev": "bun run src/index.ts",
     "build": "tsup",
+    "preview": "bun run src/index.ts",
     "serve": "node dist/index.cjs",
     "check": "biome check --write ./src",
     "format": "biome format --write ./src",
