@@ -45,7 +45,12 @@ export function trackAndSetupIos() {
   IosTracker.subscribe(async ({ event, device: { id } }) => {
     if (event === "add") {
       const task = addIos(id as Udid);
-      await task.pipe(Ef.scoped, Ef.provide(FetchHttpClient.layer), Ef.runPromise);
+      await task.pipe(
+        Ef.tapError(Ef.logError),
+        Ef.scoped,
+        Ef.provide(FetchHttpClient.layer),
+        Ef.runPromise,
+      );
     }
 
     if (event === "remove") {

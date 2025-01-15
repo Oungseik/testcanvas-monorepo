@@ -68,7 +68,12 @@ export function trackAndSetupAndroid() {
     if ((event === "add" || event === "change") && (type === "device" || type === "emulator")) {
       const task = addAndroid(id as Udid);
       // TODO handle the error of the task
-      await task.pipe(Ef.scoped, Ef.provide(FetchHttpClient.layer), Ef.runPromise);
+      await task.pipe(
+        Ef.tapError(Ef.logError),
+        Ef.scoped,
+        Ef.provide(FetchHttpClient.layer),
+        Ef.runPromise,
+      );
     }
 
     if (event === "remove") {
