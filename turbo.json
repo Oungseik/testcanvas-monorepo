@@ -2,11 +2,18 @@
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
   "daemon": false,
+  "globalEnv": ["ANDROID_HOME", "ANDROID_SDK_ROOT", "JAVA_HOME"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**", "dist", ".svelte-kit", "build"]
+    },
+    "preview": {
+      "dependsOn": ["^build", "build"],
+      "cache": false,
+      "persistent": true,
+      "outputs": []
     },
     "lint": {
       "dependsOn": ["^lint"],

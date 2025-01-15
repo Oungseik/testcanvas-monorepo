@@ -9,7 +9,8 @@
     "check": "turbo check",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "format": "turbo format"
+    "format": "turbo format",
+    "preview": "turbo preview"
   },
   "devDependencies": {
     "@repo/biome-config": "workspace:*",
