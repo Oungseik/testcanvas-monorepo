@@ -1,5 +1,4 @@
 import { IosTracker } from "@/Trackers";
-import { getInfo } from "@/Trackers/Ios";
 import { FetchHttpClient, HttpBody, HttpClient } from "@effect/platform";
 import type { Udid } from "@repo/domain";
 import { Config, Effect as Ef } from "effect";
@@ -7,11 +6,10 @@ import { Config, Effect as Ef } from "effect";
 /** keep device udid with the model name just for logging purpose */
 const deviceMap: Map<Udid, string> = new Map();
 
-function addIos(udid: Udid) {
+function addIos({ udid, name, os_version }: { udid: Udid; name: string; os_version: string }) {
   return Ef.gen(function* () {
     const gadsHost = yield* Config.string("GADS_URL");
     const client = yield* HttpClient.HttpClient;
-    const { name, os_version } = yield* getInfo(udid);
 
     yield* HttpBody.json({
       udid: udid,
@@ -42,9 +40,9 @@ function removeIos(udid: Udid) {
 }
 
 export function trackAndSetupIos() {
-  IosTracker.subscribe(async ({ event, device: { id } }) => {
+  IosTracker.subscribe(async ({ event, device }) => {
     if (event === "add") {
-      const task = addIos(id as Udid);
+      const task = addIos(device);
       await task.pipe(
         Ef.tapError(Ef.logError),
         Ef.scoped,
@@ -54,7 +52,7 @@ export function trackAndSetupIos() {
     }
 
     if (event === "remove") {
-      const task = removeIos(id as Udid);
+      const task = removeIos(device.udid);
       // TODO handle the error of the task
       await task.pipe(Ef.scoped, Ef.provide(FetchHttpClient.layer), Ef.runPromise);
     }

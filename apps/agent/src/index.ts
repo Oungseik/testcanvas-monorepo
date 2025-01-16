@@ -33,4 +33,4 @@ Promise.all([
 });
 
 trackAndSetupAndroid();
-// trackAndSetupIos();
+trackAndSetupIos();

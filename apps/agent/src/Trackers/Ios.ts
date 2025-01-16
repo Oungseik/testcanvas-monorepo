@@ -1,38 +1,71 @@
-import cp from "node:child_process";
+import cp, { type ChildProcessWithoutNullStreams } from "node:child_process";
 import { Signal } from "@/Signal";
-import type { Udid } from "@repo/domain";
-import { Data, Effect as Ef } from "effect";
+import { Udid } from "@repo/domain";
+import { Data, Effect as Ef, Schema as S } from "effect";
 
 const diff = <T>(xs: T[], ys: T[]) => xs.filter((x) => !ys.includes(x));
 
+const IosListenMsg = S.Struct({
+  MessageType: S.Literal("Attached", "Detached"),
+  Properties: S.Struct({
+    SerialNumber: Udid,
+  }),
+});
+
 type IosEvent = {
   event: "add" | "remove";
-  device: { id: Udid; type: "real" };
+  device: { udid: Udid; type: "real"; name: string; os_version: string; model_number: string };
 };
 
 class IosTracker extends Signal<IosEvent> {
+  proc: ChildProcessWithoutNullStreams;
+
   constructor() {
     super();
 
-    const ps = cp.spawn("ios", ["listen"]);
-    ps.stdout.on("data", (data) => {
+    this.proc = cp.spawn("ios", ["listen"]);
+    this.proc.stdout.on("data", (data) => {
       for (const output of data.toString().split("\n")) {
         if (!output) {
           continue;
         }
-        const device = JSON.parse(output);
+        
+        // FIXME this decoding process might throw error
+        const device = S.decodeUnknownSync(IosListenMsg)(JSON.parse(output));
         if (device.MessageType === "Attached") {
-          this.notify({
-            event: "add",
-            device: { id: device.Properties.SerialNumber as Udid, type: "real" },
-          });
+          this.add(device);
         }
 
-        if (device.Message === "Detached") {
-          this.notify({ event: "remove", device: { id: "unknown" as Udid, type: "real" } });
+        if (device.MessageType === "Detached") {
+          // FIXME - detech does not include SerialNumber
+          this.remove(device);
         }
       }
     });
+  }
+
+  private add(device: typeof IosListenMsg.Type): void {
+    const task = getInfo(device.Properties.SerialNumber).pipe(
+      Ef.tap((info) => {
+        this.notify({
+          event: "add",
+          device: { ...info, udid: device.Properties.SerialNumber, type: "real" },
+        });
+      }),
+    );
+    task.pipe(Ef.tapError(Ef.logError), Ef.runPromise);
+  }
+
+  private remove(device: typeof IosListenMsg.Type): void {
+    const task = getInfo(device.Properties.SerialNumber).pipe(
+      Ef.tap((info) => {
+        this.notify({
+          event: "remove",
+          device: { ...info, udid: device.Properties.SerialNumber, type: "real" },
+        });
+      }),
+    );
+    task.pipe(Ef.tapError(Ef.logError), Ef.runPromise);
   }
 }
 
@@ -45,9 +78,11 @@ export class GoIosError extends Data.TaggedError("GoIosError")<{
 interface IphoneInfo {
   name: string;
   os_version: string;
+  model_number: string;
 }
 
-export function getInfo(udid: Udid) {
+// TODO: This should be private use only
+function getInfo(udid: Udid): Ef.Effect<IphoneInfo, GoIosError, never> {
   return Ef.async<IphoneInfo, GoIosError>((resume) => {
     cp.exec(`ios info --udid=${udid}`, (err, stdout, stderr) => {
       if (err) {
@@ -68,6 +103,7 @@ export function getInfo(udid: Udid) {
         Ef.succeed({
           name: data.DeviceName,
           os_version: data.ProductVersion,
+          model_number: data.ModelNumber,
         }),
       );
     });
