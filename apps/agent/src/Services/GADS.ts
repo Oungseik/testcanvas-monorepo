@@ -13,6 +13,17 @@ import getPort, { portNumbers } from "get-port";
 type Provider = AndroidProvider | IosProvider;
 type OS = "linux" | "windows" | "darwin";
 
+function checkProvider(nickname: string) {
+  return Ef.gen(function* () {
+    const client = yield* HttpClient.HttpClient;
+    const gadsHost = yield* Config.string("GADS_URL");
+    const proviers = yield* client
+      .get(`${gadsHost}/admin/proviers`)
+      .pipe(Ef.andThen((res) => res.json));
+    return (proviers as Provider[]).some((p) => p.nickname === nickname);
+  });
+}
+
 // FIXME - this function contains a lot of duplication
 export function setupAndroidProvider() {
   const nickname = "AndroidProvider";
@@ -20,11 +31,8 @@ export function setupAndroidProvider() {
     const client = yield* HttpClient.HttpClient;
     const gadsHost = yield* Config.string("GADS_URL");
 
-    const providers = (yield* client
-      .get(`${gadsHost}/admin/providers`)
-      .pipe(Ef.andThen((res) => res.json))) as Provider[];
-
-    if (providers.some((p) => p.nickname === nickname)) {
+    const isProviderExist = yield* checkProvider(nickname);
+    if (isProviderExist) {
       return yield* Ef.logInfo(`${nickname} already exist`);
     }
 
@@ -66,11 +74,8 @@ export function setupIosProvider() {
       Config.withDefault(undefined),
     );
 
-    const providers = (yield* client
-      .get(`${gadsHost}/admin/providers`)
-      .pipe(Ef.andThen((res) => res.json))) as Provider[];
-
-    if (providers.some((p) => p.nickname === nickname)) {
+    const isProviderExist = yield* checkProvider(nickname);
+    if (isProviderExist) {
       return yield* Ef.logInfo(`${nickname} already exist`);
     }
 
