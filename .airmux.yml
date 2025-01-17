@@ -1,0 +1,31 @@
+name: monorepo
+root: $HOME/Projects/node/testCanvas/monorepo
+on_create:
+  - docker restart mongodb
+  - unset http_proxy https_proxy
+on_stop:
+windows:
+  - editor:
+      panes:
+  - backend:
+    panes:
+      - cd ./apps/server && pnpm run dev
+
+      - split: horizontal
+        commands: cd ./apps/server && pnpm run dev:auth
+
+      - split_from: 1
+        split: vertical
+        commands: 
+          - cd ./apps/agent && bun run src/index.ts
+
+      - split_from: 2
+        split: vertical
+        commands: 
+          - cd ./apps/web && pnpm run dev
+
+  - GADS Grid:
+    layout: main-vertical
+    panes:
+      - gads hub --host-address 192.168.99.192 --port 8000
+      - java -jar ./selenium-server-4.15.0.jar hub --host 192.168.99.192 --port 4444  
