@@ -79,6 +79,7 @@ interface IphoneInfo {
   name: string;
   os_version: string;
   model_number: string;
+  product_type: string; // the model name which can relate with the device dimension scraped from gsmarena
 }
 
 // TODO: This should be private use only
@@ -104,6 +105,7 @@ function getInfo(udid: Udid): Ef.Effect<IphoneInfo, GoIosError, never> {
           name: data.DeviceName,
           os_version: data.ProductVersion,
           model_number: data.ModelNumber,
+          product_type: data.ProductType,
         }),
       );
     });
