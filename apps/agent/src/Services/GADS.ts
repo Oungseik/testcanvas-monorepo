@@ -17,10 +17,10 @@ function checkProvider(nickname: string) {
   return Ef.gen(function* () {
     const client = yield* HttpClient.HttpClient;
     const gadsHost = yield* Config.string("GADS_URL");
-    const proviers = yield* client
-      .get(`${gadsHost}/admin/proviers`)
+    const providers = yield* client
+      .get(`${gadsHost}/admin/providers`)
       .pipe(Ef.andThen((res) => res.json));
-    return (proviers as Provider[]).some((p) => p.nickname === nickname);
+    return (providers as Provider[]).some((p) => p.nickname === nickname);
   });
 }
 
